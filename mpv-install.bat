@@ -17,11 +17,14 @@ set mpv_args=
 
 :: Get mpv.exe location
 set mpv_path=%~dp0mpv.exe
-if not exist "%mpv_path%" call :die "mpv.exe not found"
+if not exist "%mpv_path%" call :die "mpv.exe not found. Place this script in the same directory as mpv.exe."
 
 :: Get mpv-document.ico location
 set icon_path=%~dp0mpv-document.ico
-if not exist "%icon_path%" call :die "mpv-document.ico not found"
+if not exist "%icon_path%" (
+    echo Warning: mpv-document.ico not found. File icons might not be set correctly.
+    set icon_path=%mpv_path%,0
+)
 
 :: Register mpv.exe under the "App Paths" key, so it can be found by
 :: ShellExecute, the run command, the start menu, etc.
@@ -36,9 +39,10 @@ set app_key=%classes_root_key%\Applications\mpv.exe
 call :reg add "%app_key%" /v "FriendlyAppName" /d "mpv" /f
 call :add_verbs "%app_key%"
 
-:: Add mpv to the "Open with" list for all video and audio file types
+:: Add mpv to the "Open with" list for all video, audio, and image file types
 call :reg add "%classes_root_key%\SystemFileAssociations\video\OpenWithList\mpv.exe" /d "" /f
 call :reg add "%classes_root_key%\SystemFileAssociations\audio\OpenWithList\mpv.exe" /d "" /f
+call :reg add "%classes_root_key%\SystemFileAssociations\image\OpenWithList\mpv.exe" /d "" /f
 
 :: Add DVD AutoPlay handler
 set autoplay_key=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers
@@ -70,6 +74,29 @@ call :reg add "%capabilities_key%" /v "ApplicationDescription" /d "mpv media pla
 :: Add file types
 set supported_types_key=%app_key%\SupportedTypes
 set file_associations_key=%capabilities_key%\FileAssociations
+
+echo.
+echo Registering Image Formats...
+:: Image formats
+call :add_type "image/jpeg"                       "image" "JPEG Image"                 ".jpeg" ".jpg" ".jfif" ".jpe"
+call :add_type "image/png"                        "image" "PNG Image"                  ".png"
+call :add_type "image/gif"                        "image" "GIF Image"                  ".gif"
+call :add_type "image/bmp"                        "image" "Bitmap Image"               ".bmp" ".dib"
+call :add_type "image/tiff"                       "image" "TIFF Image"                 ".tiff" ".tif"
+call :add_type "image/webp"                       "image" "WebP Image"                 ".webp"
+call :add_type "image/heic"                       "image" "HEIC Image"                 ".heic"
+call :add_type "image/heif"                       "image" "HEIF Image"                 ".heif"
+call :add_type "image/avif"                       "image" "AVIF Image"                 ".avif"
+call :add_type "image/jxl"                        "image" "JPEG XL Image"              ".jxl"
+call :add_type "image/svg+xml"                    "image" "SVG Image"                  ".svg"
+call :add_type "image/x-icon"                     "image" "Icon File"                  ".ico"
+call :add_type "image/vnd.adobe.photoshop"        "image" "Photoshop Document"         ".psd"
+call :add_type ""                                 "image" "Targa Image"                ".tga"
+call :add_type ""                                 "image" "DirectDraw Surface"         ".dds"
+
+
+echo.
+echo Registering Audio/Video Formats...
 :: DVD/Blu-ray audio formats
 call :add_type "audio/ac3"                        "audio" "AC-3 Audio"                 ".ac3" ".a52"
 call :add_type "audio/eac3"                       "audio" "E-AC-3 Audio"               ".eac3"
@@ -175,12 +202,15 @@ call :reg add "HKLM\SOFTWARE\RegisteredApplications" /v "mpv" /d "SOFTWARE\Clien
 
 echo.
 echo Installed successfully^^! You can now configure mpv's file associations in the
-echo Default Programs control panel.
+echo Default Programs control panel (or Settings -> Apps -> Default apps).
+echo.
+echo Note: While mpv can open image files, it is primarily a video player.
+echo Its image viewing capabilities are basic.
 echo.
 if [%unattended%] == [yes] exit 0
-<nul set /p =Press any key to open the Default Programs control panel . . .
+<nul set /p =Press any key to open the Default Programs settings (may vary by Windows version) . . .
 pause >nul
-control /name Microsoft.DefaultPrograms
+start ms-settings:defaultapps
 exit 0
 
 :die
@@ -196,7 +226,7 @@ exit 0
 	openfiles >nul 2>&1
 	if errorlevel 1 (
 		echo This batch script requires administrator privileges. Right-click on
-		echo mpv-install.bat and select "Run as administrator".
+		echo this .bat file and select "Run as administrator".
 		call :die
 	)
 	goto :EOF
@@ -212,6 +242,7 @@ exit 0
 
 :reg
 	:: Wrap the reg command to check for errors
+	set error=no
 	>nul reg %*
 	if errorlevel 1 set error=yes
 	if [%error%] == [yes] echo Error in command: reg %*
@@ -286,7 +317,7 @@ exit 0
 	set friendly_name=%~3
 	set extension=%~4
 
-	echo Adding "%extension%" file type
+	echo Adding "%extension%" file type (%friendly_name% - %perceived_type%)
 
 	:: Add ProgId
 	set prog_id=io.mpv%extension%
