@@ -7,7 +7,7 @@ How to install
 --------------
 
 1. Make sure you have the latest build of mpv. Official builds are here:
-   [https://mpv.srsfckn.biz/](https://nightly.link/mpv-player/mpv/workflows/build/master)
+   [https://nightly.link/mpv-player/mpv/workflows/build/master](https://nightly.link/mpv-player/mpv/workflows/build/master)
 2. Download the zip: https://github.com/rossy/mpv-install/archive/master.zip
    <br>
    **Note:** Make sure you use the above link. Don't use GitHub's "Raw" links
