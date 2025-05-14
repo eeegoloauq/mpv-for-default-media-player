@@ -74,8 +74,6 @@ Found a bug or have an improvement?
 
 This project is distributed under the **MIT License**. See the `LICENSE` file for more details.
 
-*(**Action for you:** Create a file named `LICENSE` in the root of your repository and paste the MIT License text into it. You can find the MIT License text easily online, e.g., on [choosealicense.com](https://choosealicense.com/licenses/mit/))*
-
 ---
 
 Enjoy MPV as your all-in-one media player on Windows!
