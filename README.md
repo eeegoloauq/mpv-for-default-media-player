@@ -6,6 +6,8 @@ Make [MPV](https://mpv.io/) your default application for videos, audio, and imag
 *   Robust installation and uninstallation scripts.
 *   Clear instructions.
 
+For the most experience use [UOSC MPV UI](https://github.com/tomasklaen/uosc) and [thumbfast](https://github.com/po5/thumbfast?tab=readme-ov-file)
+
 ## 🔧 Prerequisites
 
 1.  **MPV Player:** `mpv.exe` is required. Get official nightly builds from [mpv-player/mpv builds](https://nightly.link/mpv-player/mpv/workflows/build/master) or check [mpv.io/installation](https://mpv.io/installation/) for other sources.
